@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyrics Key-ifier Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+        }
+        
+        header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        header p.code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: .9rem;
+            line-height: 100%;
+            text-align: left;
+            padding: 10px;
+            background: rgba(0,0,0,0.6);
+        }
+
+        .workflow {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .step {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+        }
+
+        .step h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        textarea[readonly] {
+            background-color: #f1f3f4;
+            cursor: default;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn.primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn.primary:hover {
+            background: linear-gradient(135deg, #2980b9, #1f628d);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn.secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn.secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .info-section {
+            background: #ecf0f1;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #bdc3c7;
+        }
+
+        .status {
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .stats span {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .workflow {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Lyrics Key-ifier Tool</h1>
+            <p>Transform lyrics to placeholders for annotation, then restore with annotations intact</p>
+            <h3>
+                Prompt element:
+            </h3>
+            <p class="code" id="promptCode">
+                *Note: I'm using placeholder lines; they are later
+                replaced with lines from different songs, so keep
+                the lines as is. Only add the annotations. Then I
+                can automatically replace them using a tool I
+                wrote myself, but it needs the line ID (for
+                example: {LINE_12}).
+            </p>
+            <button id="copyPromptButton" class="btn secondary">Copy prompt element</button>
+        </header>
+
+        <div class="workflow">
+            <!-- Step 1: Original to Placeholders -->
+            <section class="step">
+                <h2>Step 1: Create Placeholders</h2>
+                <div class="input-group">
+                    <label for="originalLyrics">Original Lyrics:</label>
+                    <textarea id="originalLyrics" placeholder="Paste your original lyrics here...
+
+[Verse 1]
+I'm walking down the street
+And feeling the sun's heat
+
+[Chorus]
+Street, streets
+I'm outside on the streets"></textarea>
+                </div>
+                
+                <button id="generatePlaceholders" class="btn primary">Generate Placeholders</button>
+                
+                <div class="input-group">
+                    <label for="placeholderLyrics">Placeholder Lyrics (copy this for annotation):</label>
+                    <textarea id="placeholderLyrics" readonly></textarea>
+                    <button id="copyPlaceholders" class="btn secondary">Copy to Clipboard</button>
+                </div>
+            </section>
+
+            <!-- Step 2: Restore with Annotations -->
+            <section class="step">
+                <h2>Step 2: Restore Original with Annotations</h2>
+                <div class="input-group">
+                    <label for="annotatedPlaceholders">Annotated Placeholders (paste from annotation tool):</label>
+                    <textarea id="annotatedPlaceholders" placeholder="Paste the annotated placeholders here...
+
+[Verse 1]
+[// slow and emotional delivery]
+{LINE_1}
+{LINE_2}"></textarea>
+                </div>
+                
+                <button id="restoreLyrics" class="btn primary">Restore Original Lyrics</button>
+                
+                <div class="input-group">
+                    <label for="finalLyrics">Final Annotated Lyrics:</label>
+                    <textarea id="finalLyrics" readonly></textarea>
+                    <button id="copyFinal" class="btn secondary">Copy to Clipboard</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- Status and Info -->
+        <div class="info-section">
+            <div id="status" class="status"></div>
+            <div class="stats">
+                <span id="lineCount">Lines: 0</span>
+                <span id="sectionCount">Sections: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // lyricProcessor.js - Core logic for processing lyrics
+        class LyricProcessor {
+            constructor() {
+                this.lineMap = new Map();
+                this.sectionPattern = /^\[.*\]$/;
+                this.placeholderPattern = /\{LINE_(\d+)\}/g;
+            }
+
+            // Parse lyrics and create placeholder mapping
+            createPlaceholders(lyrics) {
+                this.lineMap.clear();
+                const lines = lyrics.split('\n');
+                const placeholderLines = [];
+                let lineCounter = 1;
+
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+                    
+                    // Skip empty lines and section headers
+                    if (trimmedLine === '' || this.sectionPattern.test(trimmedLine)) {
+                        placeholderLines.push(line);
+                        continue;
+                    }
+
+                    // Create placeholder for actual lyric lines
+                    const placeholder = `{LINE_${lineCounter}}`;
+                    this.lineMap.set(lineCounter, trimmedLine);
+                    
+                    // Preserve original indentation
+                    const indentation = line.match(/^\s*/)[0];
+                    placeholderLines.push(indentation + placeholder);
+                    
+                    lineCounter++;
+                }
+
+                return {
+                    placeholderLyrics: placeholderLines.join('\n'),
+                    lineCount: lineCounter - 1,
+                    sectionCount: this.countSections(lyrics)
+                };
+            }
+
+            // Restore original lyrics from annotated placeholders
+            restoreFromPlaceholders(annotatedPlaceholders) {
+                if (this.lineMap.size === 0) {
+                    throw new Error('No original lyrics stored. Please run Step 1 first.');
+                }
+
+                const restoredLines = [];
+                const lines = annotatedPlaceholders.split('\n');
+
+                for (const line of lines) {
+                    let processedLine = line;
+                    
+                    // Replace all placeholders in this line with original lyrics
+                    processedLine = processedLine.replace(this.placeholderPattern, (match, lineNumber) => {
+                        const originalLine = this.lineMap.get(parseInt(lineNumber));
+                        if (!originalLine) {
+                            throw new Error(`Placeholder ${match} not found in original lyrics`);
+                        }
+                        return originalLine;
+                    });
+                    
+                    restoredLines.push(processedLine);
+                }
+
+                return restoredLines.join('\n');
+            }
+
+            // Count sections in lyrics
+            countSections(lyrics) {
+                return (lyrics.match(/^\[.*\]$/gm) || []).length;
+            }
+
+            // Get current stats
+            getStats() {
+                return {
+                    lineCount: this.lineMap.size,
+                    sectionCount: 0 // Will be set during processing
+                };
+            }
+
+            // Validate placeholder format
+            validatePlaceholders(text) {
+                const placeholders = text.match(this.placeholderPattern) || [];
+                const issues = [];
+
+                for (const placeholder of placeholders) {
+                    const lineNumber = parseInt(placeholder.match(/\d+/)[0]);
+                    if (!this.lineMap.has(lineNumber)) {
+                        issues.push(`Unknown placeholder: ${placeholder}`);
+                    }
+                }
+
+                return {
+                    isValid: issues.length === 0,
+                    issues: issues
+                };
+            }
+        }
+
+        // uiController.js - UI interaction and state management
+        class UIController {
+            constructor(processor) {
+                this.processor = processor;
+                this.elements = {};
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.elements = {
+                    originalLyrics: document.getElementById('originalLyrics'),
+                    placeholderLyrics: document.getElementById('placeholderLyrics'),
+                    annotatedPlaceholders: document.getElementById('annotatedPlaceholders'),
+                    finalLyrics: document.getElementById('finalLyrics'),
+                    generateBtn: document.getElementById('generatePlaceholders'),
+                    restoreBtn: document.getElementById('restoreLyrics'),
+                    copyPlaceholdersBtn: document.getElementById('copyPlaceholders'),
+                    copyFinalBtn: document.getElementById('copyFinal'),
+                    status: document.getElementById('status'),
+                    lineCount: document.getElementById('lineCount'),
+                    sectionCount: document.getElementById('sectionCount'),
+                    copyPromptButton: document.getElementById('copyPromptButton'),
+                    promptCode: document.getElementById('promptCode')
+
+                };
+            }
+
+            bindEvents() {
+                this.elements.generateBtn.addEventListener('click', () => this.handleGeneratePlaceholders());
+                this.elements.restoreBtn.addEventListener('click', () => this.handleRestoreLyrics());
+                this.elements.copyPlaceholdersBtn.addEventListener('click', () => this.copyToClipboard(this.elements.placeholderLyrics.value));
+                this.elements.copyFinalBtn.addEventListener('click', () => this.copyToClipboard(this.elements.finalLyrics.value));
+                this.elements.copyPromptButton.addEventListener('click', () => this.copyToClipboard(this.elements.promptCode.innerText));
+                
+                // Auto-clear status after input changes
+                this.elements.originalLyrics.addEventListener('input', () => this.clearStatus());
+                this.elements.annotatedPlaceholders.addEventListener('input', () => this.clearStatus());
+            }
+
+            handleGeneratePlaceholders() {
+                try {
+                    const originalText = this.elements.originalLyrics.value.trim();
+                    
+                    if (!originalText) {
+                        this.showStatus('Please enter original lyrics first.', 'error');
+                        return;
+                    }
+
+                    const result = this.processor.createPlaceholders(originalText);
+                    
+                    this.elements.placeholderLyrics.value = result.placeholderLyrics;
+                    this.updateStats(result.lineCount, result.sectionCount);
+                    this.showStatus(`Successfully generated ${result.lineCount} placeholders for ${result.sectionCount} sections.`, 'success');
+                    
+                    // Enable copy button
+                    this.elements.copyPlaceholdersBtn.disabled = false;
+
+                } catch (error) {
+                    this.showStatus(`Error: ${error.message}`, 'error');
+                }
+            }
+
+            handleRestoreLyrics() {
+                try {
+                    const annotatedText = this.elements.annotatedPlaceholders.value.trim();
+                    
+                    if (!annotatedText) {
+                        this.showStatus('Please enter annotated placeholders first.', 'error');
+                        return;
+                    }
+
+                    // Validate placeholders before processing
+                    const validation = this.processor.validatePlaceholders(annotatedText);
+                    if (!validation.isValid) {
+                        this.showStatus(`Validation failed: ${validation.issues.join(', ')}`, 'error');
+                        return;
+                    }
+
+                    const restoredLyrics = this.processor.restoreFromPlaceholders(annotatedText);
+                    
+                    this.elements.finalLyrics.value = restoredLyrics;
+                    this.showStatus('Successfully restored original lyrics with annotations!', 'success');
+                    
+                    // Enable copy button
+                    this.elements.copyFinalBtn.disabled = false;
+
+                } catch (error) {
+                    this.showStatus(`Error: ${error.message}`, 'error');
+                }
+            }
+
+            async copyToClipboard(textElement) {
+                try {
+                    await navigator.clipboard.writeText(textElement);
+                    this.showStatus('Copied to clipboard!', 'success');
+                } catch (error) {
+                    // Fallback for older browsers
+                    textElement.select();
+                    document.execCommand('copy');
+                    this.showStatus('Copied to clipboard!', 'success');
+                }
+            }
+
+            showStatus(message, type) {
+                this.elements.status.textContent = message;
+                this.elements.status.className = `status ${type}`;
+                
+                // Auto-clear success messages after 3 seconds
+                if (type === 'success') {
+                    setTimeout(() => this.clearStatus(), 3000);
+                }
+            }
+
+            clearStatus() {
+                this.elements.status.textContent = '';
+                this.elements.status.className = 'status';
+            }
+
+            updateStats(lineCount, sectionCount) {
+                this.elements.lineCount.textContent = `Lines: ${lineCount}`;
+                this.elements.sectionCount.textContent = `Sections: ${sectionCount}`;
+            }
+        }
+
+        // app.js - Main application initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            const processor = new LyricProcessor();
+            const ui = new UIController(processor);
+            
+            // Add example lyrics for demonstration
+            const exampleLyrics = `[Verse 1]
+I'm walking down the street
+And feeling the sun's heat
+
+[Chorus]
+Street, streets
+I'm outside on the streets
+Streets, streets
+I'm living for the streets
+
+[Verse 2]
+I'm at the beach
+And the street just stopped
+
+[Chorus]
+Street, streets
+I'm outside on the streets
+Streets, streets
+I'm living for the streets`;
+
+            document.getElementById('originalLyrics').value = exampleLyrics;
+            
+            console.log('Lyrics Key-ifier Tool initialized successfully!');
+        });
+    </script>
+</body>
+</html>
