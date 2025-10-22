@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+    <title>Album Cover Prompt Builder</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      ``` body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 40px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        opacity: 0.9;
+        font-size: 16px;
+      }
+
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+      }
+
+      .left-panel,
+      .right-panel {
+        padding: 40px;
+      }
+
+      .left-panel {
+        background: #f8f9fa;
+        border-right: 1px solid #e0e0e0;
+      }
+
+      .section {
+        margin-bottom: 30px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .section-title::before {
+        content: '';
+        width: 4px;
+        height: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: #555;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      input[type="text"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: all 0.3s;
+        font-family: inherit;
+      }
+
+      input[type="text"]:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      button {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        flex: 1;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        flex: 1;
+      }
+
+      .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+      }
+
+      .btn-small {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+
+      .output-section {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .output-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .output-content {
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 16px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+        max-height: 200px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .copy-btn {
+        margin-top: 10px;
+        width: 100%;
+        background: #667eea;
+        color: white;
+      }
+
+      .copy-btn:hover {
+        background: #5568d3;
+      }
+
+      .final-prompt {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 30px;
+      }
+
+      .final-prompt .output-title {
+        color: white;
+        font-size: 16px;
+      }
+
+      .final-prompt .output-content {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        max-height: 300px;
+      }
+
+      .final-prompt .copy-btn {
+        background: white;
+        color: #667eea;
+      }
+
+      .final-prompt .copy-btn:hover {
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #2196f3;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: #1565c0;
+        margin-bottom: 20px;
+      }
+
+      .placeholder {
+        display: inline-block;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      .status-message {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-size: 14px;
+        font-weight: 500;
+        display: none;
+      }
+
+      .status-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      @media (max-width: 1200px) {
+        .main-content {
+          grid-template-columns: 1fr;
+        }
+
+        .left-panel {
+          border-right: none;
+          border-bottom: 1px solid #e0e0e0;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+
+        .button-group {
+          flex-direction: column;
+        }
+      }
+
+    </style>
+    ```
+
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎨 Album Cover Prompt Builder</h1>
+        <p>Professional AI prompt generation
+          system for album artwork</p>
+      </div>
+
+      ```
+      <div class="main-content">
+        <!-- LEFT PANEL: INPUTS -->
+        <div class="left-panel">
+          <div class="section">
+            <div class="section-title">Basic
+              Information</div>
+            <div class="input-group">
+              <label>Song/Album Title</label>
+              <input type="text" id="albumTitle"
+                placeholder="e.g., Midnight Dreams">
+            </div>
+            <div class="input-group">
+              <label>Artist Name</label>
+              <input type="text" id="artistName"
+                placeholder="e.g., Luna Rose">
+            </div>
+            <div class="input-group">
+              <label>Genre</label>
+              <select id="genre">
+                <option value="">-- Select Genre
+                  --</option>
+                <option value="pop">Pop</option>
+                <option value="rock">Rock</option>
+                <option value="hiphop">Hip-Hop/Rap
+                </option>
+                <option value="electronic">
+                  Electronic/EDM</option>
+                <option value="jazz">Jazz</option>
+                <option value="classical">
+                  Classical</option>
+                <option value="indie">
+                  Indie/Alternative</option>
+                <option value="country">
+                  Country/Folk</option>
+                <option value="rnb">R&B/Soul
+                </option>
+                <option value="metal">Metal/Hard
+                  Rock</option>
+                <option value="punk">Punk</option>
+                <option value="ambient">
+                  Ambient/Chill</option>
+                <option value="blues">Blues
+                </option>
+                <option value="reggae">Reggae/Ska
+                </option>
+                <option value="experimental">
+                  Experimental/Avant-Garde
+                </option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label>Song Description (2-3
+                sentences)</label>
+              <textarea id="songDescription"
+                placeholder="Describe the song's theme, mood, key concepts, or lyrical content..."></textarea>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Style
+              Foundation</div>
+            <div class="input-group">
+              <label>Art Style</label>
+              <select id="artStyle">
+                <option value="">-- Auto-select
+                  based on genre --</option>
+              </select>
+              <div class="button-group"
+                style="margin-top: 10px;">
+                <button
+                  class="btn-secondary btn-small"
+                  onclick="randomizeArtStyle()">🎲
+                  Random</button>
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Composition Structure</label>
+              <select id="composition">
+                <option value="">-- Auto-select
+                  based on genre --</option>
+              </select>
+              <div class="button-group"
+                style="margin-top: 10px;">
+                <button
+                  class="btn-secondary btn-small"
+                  onclick="randomizeComposition()">🎲
+                  Random</button>
+              </div>
+            </div>
+            <div class="input-group">
+              <label>Typography Treatment</label>
+              <select id="typography">
+                <option value="">-- Auto-select
+                  based on genre --</option>
+              </select>
+              <div class="button-group"
+                style="margin-top: 10px;">
+                <button
+                  class="btn-secondary btn-small"
+                  onclick="randomizeTypography()">🎲
+                  Random</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Content
+              Generation</div>
+            <div class="info-box">
+              Use the button below to get an LLM
+              prompt. Copy it to Claude/ChatGPT to
+              generate the contextual content,
+              then paste the results back here.
+            </div>
+            <button class="btn-primary"
+              onclick="generateLLMPrompt()">📋
+              Generate LLM Prompt</button>
+          </div>
+        </div>
+
+        <!-- RIGHT PANEL: OUTPUTS -->
+        <div class="right-panel">
+          <div class="section">
+            <div class="section-title">Step 1: LLM
+              Content Prompt</div>
+            <div class="output-section">
+              <div class="output-title">Copy this
+                prompt to your LLM</div>
+              <div class="output-content"
+                id="llmPrompt">Fill in the basic
+                information and click "Generate
+                LLM Prompt"</div>
+              <button class="copy-btn"
+                onclick="copyToClipboard('llmPrompt')">📋
+                Copy to Clipboard</button>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Step 2:
+              Paste LLM Response</div>
+            <div class="input-group">
+              <label>Visual Concept</label>
+              <textarea id="visualConcept"
+                placeholder="Paste the visual concept from LLM..."></textarea>
+            </div>
+            <div class="input-group">
+              <label>Color Palette</label>
+              <input type="text" id="colorPalette"
+                placeholder="Paste the color palette from LLM...">
+            </div>
+            <div class="input-group">
+              <label>Mood Descriptor</label>
+              <input type="text"
+                id="moodDescriptor"
+                placeholder="Paste the mood descriptor from LLM...">
+            </div>
+            <div class="input-group">
+              <label>Symbolic Elements</label>
+              <input type="text"
+                id="symbolicElements"
+                placeholder="Paste the symbolic elements from LLM...">
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Step 3:
+              Generate Final Prompt</div>
+            <div class="button-group">
+              <button class="btn-primary"
+                onclick="generateFinalPrompt()">✨
+                Generate Album Cover
+                Prompt</button>
+            </div>
+            <div id="statusMessage"
+              class="status-message status-success">
+            </div>
+          </div>
+
+          <div class="final-prompt">
+            <div class="output-title">🎯 Final
+              Album Cover Prompt</div>
+            <div class="output-content"
+              id="finalPrompt">Your complete
+              prompt will appear here...</div>
+            <button class="copy-btn"
+              onclick="copyToClipboard('finalPrompt')">📋
+              Copy Final Prompt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Data structures
+      const genreStyles = {
+        pop: {
+          artStyles: ["Digital illustration", "3D rendered", "Pop art graphic", "Photographic realism", "Minimalist graphic"],
+          compositions: ["Centered symmetrical", "Rule of thirds", "Negative space dominant", "Circular focus"],
+          typography: ["Bold sans-serif dominant", "Neon glowing", "3D dimensional", "Geometric modular"]
+        },
+        rock: {
+          artStyles: ["Photographic realism", "Vintage photography", "Noir high contrast", "Hand-drawn sketch", "Collage mixed media"],
+          compositions: ["Asymmetric tension", "Diagonal energy", "Edge-to-edge bleed", "Bottom-weighted"],
+          typography: ["Stencil industrial", "Distressed analog", "Graffiti urban", "Bold sans-serif dominant"]
+        },
+        hiphop: {
+          artStyles: ["Photographic realism", "Collage mixed media", "Pop art graphic", "Digital illustration", "Cyberpunk digital"],
+          compositions: ["Centered symmetrical", "Rule of thirds", "Bottom-weighted", "Asymmetric tension"],
+          typography: ["Bold sans-serif dominant", "Graffiti urban", "3D dimensional", "Stencil industrial"]
+        },
+        electronic: {
+          artStyles: ["Cyberpunk digital", "3D rendered", "Abstract expressionist", "Digital illustration", "Minimalist graphic"],
+          compositions: ["Circular focus", "Diagonal energy", "Grid systematic", "Overlapping layers"],
+          typography: ["Neon glowing", "Geometric modular", "3D dimensional", "Minimalist hairline"]
+        },
+        jazz: {
+          artStyles: ["Vintage photography", "Painterly artistic", "Minimalist graphic", "Noir high contrast", "Hand-drawn sketch"],
+          compositions: ["Rule of thirds", "Negative space dominant", "Golden ratio spiral", "Asymmetric tension"],
+          typography: ["Elegant serif refined", "Handwritten organic", "Vintage poster", "Minimalist hairline"]
+        },
+        classical: {
+          artStyles: ["Painterly artistic", "Minimalist graphic", "Vintage photography", "Watercolor artistic", "Digital illustration"],
+          compositions: ["Centered symmetrical", "Golden ratio spiral", "Negative space dominant", "Frame within frame"],
+          typography: ["Elegant serif refined", "Carved relief", "Minimalist hairline", "Geometric modular"]
+        },
+        indie: {
+          artStyles: ["Vintage photography", "Hand-drawn sketch", "Collage mixed media", "Watercolor artistic", "Photographic realism"],
+          compositions: ["Rule of thirds", "Asymmetric tension", "Frame within frame", "Negative space dominant"],
+          typography: ["Handwritten organic", "Distressed analog", "Elegant serif refined", "Invisible integrated"]
+        },
+        country: {
+          artStyles: ["Vintage photography", "Photographic realism", "Hand-drawn sketch", "Watercolor artistic", "Painterly artistic"],
+          compositions: ["Horizontal landscape", "Rule of thirds", "Golden ratio spiral", "Centered symmetrical"],
+          typography: ["Handwritten organic", "Vintage poster", "Elegant serif refined", "Distressed analog"]
+        },
+        rnb: {
+          artStyles: ["Photographic realism", "Painterly artistic", "Vintage photography", "Minimalist graphic", "Noir high contrast"],
+          compositions: ["Centered symmetrical", "Vertical portrait", "Negative space dominant", "Rule of thirds"],
+          typography: ["Elegant serif refined", "Bold sans-serif dominant", "Handwritten organic", "3D dimensional"]
+        },
+        metal: {
+          artStyles: ["Noir high contrast", "Hand-drawn sketch", "Woodcut print style", "Collage mixed media", "Surrealist photo manipulation"],
+          compositions: ["Centered symmetrical", "Asymmetric tension", "Diagonal energy", "Edge-to-edge bleed"],
+          typography: ["Deconstructed experimental", "Carved relief", "Distressed analog", "Stencil industrial"]
+        },
+        punk: {
+          artStyles: ["Collage mixed media", "Hand-drawn sketch", "Pop art graphic", "Photographic realism", "Vintage photography"],
+          compositions: ["Asymmetric tension", "Edge-to-edge bleed", "Overlapping layers", "Diagonal energy"],
+          typography: ["Graffiti urban", "Stencil industrial", "Deconstructed experimental", "Distressed analog"]
+        },
+        ambient: {
+          artStyles: ["Abstract expressionist", "Watercolor artistic", "Minimalist graphic", "3D rendered", "Painterly artistic"],
+          compositions: ["Negative space dominant", "Circular focus", "Golden ratio spiral", "Horizontal landscape"],
+          typography: ["Minimalist hairline", "Handwritten organic", "Invisible integrated", "Elegant serif refined"]
+        },
+        blues: {
+          artStyles: ["Vintage photography", "Noir high contrast", "Hand-drawn sketch", "Painterly artistic", "Photographic realism"],
+          compositions: ["Centered symmetrical", "Rule of thirds", "Bottom-weighted", "Vertical portrait"],
+          typography: ["Vintage poster", "Handwritten organic", "Elegant serif refined", "Distressed analog"]
+        },
+        reggae: {
+          artStyles: ["Pop art graphic", "Collage mixed media", "Digital illustration", "Vintage photography", "Hand-drawn sketch"],
+          compositions: ["Grid systematic", "Centered symmetrical", "Overlapping layers", "Rule of thirds"],
+          typography: ["Bold sans-serif dominant", "Vintage poster", "Stencil industrial", "Handwritten organic"]
+        },
+        experimental: {
+          artStyles: ["Surrealist photo manipulation", "Abstract expressionist", "Collage mixed media", "Deconstructed experimental", "Cyberpunk digital"],
+          compositions: ["Asymmetric tension", "Overlapping layers", "Diagonal energy", "Frame within frame"],
+          typography: ["Deconstructed experimental", "Invisible integrated", "Liquid flowing", "Geometric modular"]
+        }
+      };
+
+      const artStyleDescriptions = {
+        "Photographic realism": "High-resolution photographic composition",
+        "Digital illustration": "Clean vector illustration style with defined edges",
+        "Painterly artistic": "Oil painting aesthetic with visible brushstroke texture",
+        "Minimalist graphic": "Minimalist geometric design with flat color application",
+        "Collage mixed media": "Mixed media collage combining photographic and illustrated elements",
+        "Vintage photography": "Vintage analog photography with film grain and authentic period processing",
+        "3D rendered": "Three-dimensional rendered scene with realistic lighting and materials",
+        "Hand-drawn sketch": "Hand-drawn illustration with organic line work and shading",
+        "Abstract expressionist": "Abstract expressionist composition with gestural marks and color fields",
+        "Surrealist photo manipulation": "Surrealist photographic manipulation blending impossible elements seamlessly",
+        "Woodcut print style": "Woodcut print aesthetic with bold lines and limited color palette",
+        "Watercolor artistic": "Watercolor painting technique with flowing pigment and soft edges",
+        "Cyberpunk digital": "Cyberpunk digital art with neon elements and futuristic textures",
+        "Noir high contrast": "Film noir aesthetic with dramatic shadows and high contrast lighting",
+        "Pop art graphic": "Pop art style with bold colors and commercial art influence"
+      };
+
+      const compositionDescriptions = {
+        "Centered symmetrical": "Symmetrically balanced composition with central focal point",
+        "Rule of thirds": "Dynamic composition following rule of thirds with offset focal elements",
+        "Diagonal energy": "Diagonal composition creating visual movement from corner to corner",
+        "Circular focus": "Circular composition drawing eye to center through radial arrangement",
+        "Vertical portrait": "Strong vertical emphasis with portrait-style framing",
+        "Horizontal landscape": "Horizontal panoramic composition with expansive feel",
+        "Negative space dominant": "Minimalist composition with dominant negative space and small focal element",
+        "Frame within frame": "Layered composition using framing devices within the image",
+        "Grid systematic": "Systematic grid-based layout with organized visual elements",
+        "Asymmetric tension": "Deliberately unbalanced asymmetric composition creating visual tension",
+        "Overlapping layers": "Multiple overlapping visual layers creating depth",
+        "Golden ratio spiral": "Composition following golden ratio spiral for natural eye flow",
+        "Bottom-weighted": "Visual mass concentrated in lower portion creating grounded feeling",
+        "Top-illuminated": "Light and visual interest emanating from top downward",
+        "Edge-to-edge bleed": "Full-bleed imagery extending to all edges without borders"
+      };
+
+      const typographyDescriptions = {
+        "Bold sans-serif dominant": "large bold sans-serif typography dominating upper third",
+        "Elegant serif refined": "refined serif typeface with classical proportions positioned centrally",
+        "Handwritten organic": "organic handwritten script integrated naturally into scene",
+        "Stencil industrial": "industrial stencil lettering with weathered texture",
+        "Minimalist hairline": "ultra-minimal hairline weight typography barely visible",
+        "3D dimensional": "dimensional typography with depth and shadow casting into scene",
+        "Deconstructed experimental": "experimental deconstructed typography with fragmented letters",
+        "Graffiti urban": "bold graffiti-style typography with spray paint texture",
+        "Vintage poster": "vintage concert poster typography with ornate decorative elements",
+        "Neon glowing": "glowing neon tube typography with authentic light bloom",
+        "Carved relief": "typography appearing carved or embossed into surface",
+        "Liquid flowing": "flowing liquid-form typography integrated organically",
+        "Geometric modular": "geometric modular typography built from basic shapes",
+        "Distressed analog": "heavily distressed typography with print artifacts and aging",
+        "Invisible integrated": "typography formed by elements within the scene itself"
+      };
+
+      // Populate dropdowns on genre change
+      document.getElementById('genre').addEventListener('change', function () {
+        const genre = this.value;
+        if (genre && genreStyles[genre]) {
+          populateDropdown('artStyle', genreStyles[genre].artStyles);
+          populateDropdown('composition', genreStyles[genre].compositions);
+          populateDropdown('typography', genreStyles[genre].typography);
+        }
+      });
+
+      function populateDropdown(id, options) {
+        const select = document.getElementById(id);
+        select.innerHTML = '<option value="">-- Select from genre-appropriate options --</option>';
+        options.forEach(option => {
+          const opt = document.createElement('option');
+          opt.value = option;
+          opt.textContent = option;
+          select.appendChild(opt);
+        });
+      }
+
+      function randomizeArtStyle() {
+        const genre = document.getElementById('genre').value;
+        if (genre && genreStyles[genre]) {
+          const options = genreStyles[genre].artStyles;
+          const random = options[Math.floor(Math.random() * options.length)];
+          document.getElementById('artStyle').value = random;
+        }
+      }
+
+      function randomizeComposition() {
+        const genre = document.getElementById('genre').value;
+        if (genre && genreStyles[genre]) {
+          const options = genreStyles[genre].compositions;
+          const random = options[Math.floor(Math.random() * options.length)];
+          document.getElementById('composition').value = random;
+        }
+      }
+
+      function randomizeTypography() {
+        const genre = document.getElementById('genre').value;
+        if (genre && genreStyles[genre]) {
+          const options = genreStyles[genre].typography;
+          const random = options[Math.floor(Math.random() * options.length)];
+          document.getElementById('typography').value = random;
+        }
+      }
+
+      function generateLLMPrompt() {
+        const title = document.getElementById('albumTitle').value;
+        const artist = document.getElementById('artistName').value;
+        const description = document.getElementById('songDescription').value;
+        const genre = document.getElementById('genre').value;
+
+        if (!title || !artist || !description || !genre) {
+          alert('Please fill in all basic information fields before generating the LLM prompt.');
+          return;
+        }
+
+        const llmPrompt = `I'm creating an album cover using a systematic design framework. Based on the following song information, generate the four required contextual elements:
+```
+
+          ** Song Title:** ${ title }
+** Artist:** ${ artist }
+** Genre:** ${ genre }
+** Description:** ${ description }
+
+Please provide:
+
+        1. ** VISUAL_CONCEPT ** (1 - 2 sentences): A concrete, observable visual scene that metaphorically or literally represents the song’s core theme.Focus on tangible imagery that a camera could capture or an artist could illustrate.
+1. ** COLOR_PALETTE ** (1 sentence): 3 - 4 specific colors with descriptive language about temperature, intensity, and mood.Example format: “desaturated blue - grey with muted purple shadows and cold steel undertones”
+        1. ** MOOD_DESCRIPTOR ** (2 - 3 words): The emotional atmosphere this song evokes.Example: “melancholic and introspective” or “explosive and cathartic”
+        1. ** SYMBOLIC_ELEMENTS ** (1 sentence): 1 - 3 small symbolic details or atmospheric elements that reinforce the theme without overwhelming the main visual.Example: “delicate cracks spreading through surface suggesting fragility”
+
+Format your response clearly with these four labeled sections.`;
+
+```
+        document.getElementById('llmPrompt').textContent = llmPrompt;
+      }
+
+      function generateFinalPrompt() {
+        // Get all values
+        const title = document.getElementById('albumTitle').value;
+        const artist = document.getElementById('artistName').value;
+        const artStyle = document.getElementById('artStyle').value;
+        const composition = document.getElementById('composition').value;
+        const typography = document.getElementById('typography').value;
+        const visualConcept = document.getElementById('visualConcept').value;
+        const colorPalette = document.getElementById('colorPalette').value;
+        const moodDescriptor = document.getElementById('moodDescriptor').value;
+        const symbolicElements = document.getElementById('symbolicElements').value;
+
+        // Validation
+        if (!title || !artist || !artStyle || !composition || !typography || !visualConcept || !colorPalette || !moodDescriptor || !symbolicElements) {
+          alert('Please fill in all fields before generating the final prompt.');
+          return;
+        }
+
+        // Get descriptions
+        const artStyleDesc = artStyleDescriptions[artStyle] || artStyle;
+        const compositionDesc = compositionDescriptions[composition] || composition;
+        const typographyDesc = typographyDescriptions[typography] || typography;
+
+        // Determine technical specs based on art style
+        let technicalSpecs = "Square 1:1 aspect ratio. High-resolution digital artwork with professional color grading. Sharp focus on primary subject with intentional depth of field. Balanced exposure maintaining detail in highlights and shadows. Clean edges and sophisticated finishing";
+
+        if (artStyle.includes("Photographic") || artStyle.includes("photography")) {
+          technicalSpecs = "Square 1:1 aspect ratio. High-resolution digital artwork with professional color grading shot on professional camera with shallow depth of field and cinematic color grade. Sharp focus on primary subject with intentional depth of field. Balanced exposure maintaining detail in highlights and shadows. Clean edges and sophisticated finishing";
+        } else if (artStyle.includes("illustration") || artStyle.includes("Digital illustration")) {
+          technicalSpecs = "Square 1:1 aspect ratio. High-resolution digital artwork with professional color grading and clean vector rendering with precise line work and flat color application. Sharp focus on primary subject with intentional depth of field. Balanced exposure maintaining detail in highlights and shadows. Clean edges and sophisticated finishing";
+        } else if (artStyle.includes("Painterly") || artStyle.includes("Watercolor")) {
+          technicalSpecs = "Square 1:1 aspect ratio. High-resolution digital artwork with professional color grading and visible artistic texture with traditional media authenticity. Sharp focus on primary subject with intentional depth of field. Balanced exposure maintaining detail in highlights and shadows. Clean edges and sophisticated finishing";
+        } else if (artStyle.includes("Minimalist")) {
+          technicalSpecs = "Square 1:1 aspect ratio. High-resolution digital artwork with professional color grading and ultra-clean execution with perfect geometric precision. Sharp focus on primary subject with intentional depth of field. Balanced exposure maintaining detail in highlights and shadows. Clean edges and sophisticated finishing";
+        }
+
+        // Build final prompt
+        const finalPrompt = `${artStyleDesc} album cover design featuring ${visualConcept}. ${compositionDesc} with ${typographyDesc} displaying "${title}" and artist name "${artist}". ${colorPalette} dominates the atmosphere creating ${moodDescriptor} feeling. ${symbolicElements} integrated throughout composition. ${technicalSpecs}. Professional album artwork with balanced hierarchy between imagery and text.`;
+
+        document.getElementById('finalPrompt').textContent = finalPrompt;
+
+        // Show success message
+        const statusMsg = document.getElementById('statusMessage');
+        statusMsg.textContent = '✓ Album cover prompt generated successfully!';
+        statusMsg.style.display = 'block';
+        setTimeout(() => {
+          statusMsg.style.display = 'none';
+        }, 3000);
+
+        // Scroll to final prompt
+        document.getElementById('finalPrompt').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        const text = element.textContent;
+
+        navigator.clipboard.writeText(text).then(() => {
+          // Visual feedback
+          const btn = event.target;
+          const originalText = btn.textContent;
+          btn.textContent = '✓ Copied!';
+          btn.style.background = '#4caf50';
+          setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '';
+          }, 2000);
+        }).catch(err => {
+          alert('Failed to copy to clipboard. Please copy manually.');
+        });
+      }
+    </script>
+    ```
+
+  </body>
+
+</html>
